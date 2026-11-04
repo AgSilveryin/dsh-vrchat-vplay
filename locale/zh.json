@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "VRChat 虚拟玩家桥",
+    "description": "通过本机 VRChat 的 OSC 接口把 agent 接入游戏：chatbox 说话、读取 avatar 参数、触发 OSC 输入动作；头部位姿走 A 线自研 HMD 驱动（真转头/抬头），手部位姿走自编译 VMT 驱动，未装驱动时自动降级为 snap turn 或仅警告。"
+  }
+}

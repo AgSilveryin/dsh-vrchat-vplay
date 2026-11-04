@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="VRChat OSC bridge">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0b1220"/>
+  <rect x="8" y="18" width="48" height="26" rx="10" fill="none" stroke="url(#g)" stroke-width="3"/>
+  <circle cx="21" cy="31" r="5.5" fill="url(#g)"/>
+  <circle cx="43" cy="31" r="5.5" fill="url(#g)"/>
+  <path d="M13 50c4 4 10 6 19 6s15-2 19-6" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M30 24c2-2 4-2 6 0" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+</svg>

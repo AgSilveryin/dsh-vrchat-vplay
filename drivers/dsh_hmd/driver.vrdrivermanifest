@@ -1,0 +1,11 @@
+{
+	"alwaysActivate": true,
+	"name" : "dsh_hmd",
+	"directory" : "",
+	"resourceOnly" : false,
+
+	"hmd_presence" :
+	[
+		"*.*"
+	]
+}

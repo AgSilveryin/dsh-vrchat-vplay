@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "VRChat Virtual Player Bridge",
+    "description": "Bridges this agent into VRChat over local OSC: speaks through the chatbox, reads avatar parameters, presses OSC input actions, drives hand poses through a self-compiled VMT driver, and controls real head/HMD pose through the A-line HMD driver (snap-turn fallback when absent)."
+  }
+}

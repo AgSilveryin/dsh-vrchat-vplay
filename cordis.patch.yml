@@ -1,0 +1,99 @@
+# dsh-VRChat-vplay bundle patch
+#
+# A Host-only bundle: one plugin row that opens the VRChat OSC bridge and
+# registers the vrchat_* tools for every agent in this profile.
+- insert:
+    - id: vrchat-vplay
+      name: dsh-vrchat-vplay
+      config:
+        # VRChat listens for OSC here (VRChat default: 9000)
+        sendPort: 9000
+        # VRChat sends avatar parameters here; the plugin listens (VRChat default: 9001)
+        listenPort: 9001
+        listenEnabled: true
+        debug: false
+
+        # ── 位姿通道（vrchat_pose）：自编译 VMT 驱动 ──────────────────────
+        # 驱动收位姿 39570、回 /VMT/Out/Alive 39571；没装驱动时工具自动降级（只警告不报错）。
+        vmtSendPort: 39570
+        vmtListenPort: 39571
+        vmtListenEnabled: true
+        # 空闲这么久后释放 39571，方便别的工具（如 vrchat-vr-driver/tools/motion.mjs）使用
+        vmtListenerIdleMs: 30000
+        # index = enable 5/6（Index 兼容手柄，推荐）；controller = enable 2/3（普通手柄）
+        vmtEnableMode: index
+        # 首次发位姿前发单位 RoomMatrix（不装 VMT Manager 时必需）
+        vmtSetRoomMatrix: true
+        poseHz: 60          # 30-90
+        poseHoldHz: 20      # hold 阶段的维持频率
+        poseHumanize: true  # 时长抖动 + idle 微动作
+        poseIdleDrift: true
+        poseSeed: 1
+
+        # ── 头部通道（vrchat_head）：A 线自研 HMD 驱动 dsh_hmd ─────────────
+        # 驱动收 /dsh/head/pose 于 39572（OpenVR 右手系，无回包）；插件用"端口是否被占用"探活。
+        # 没装驱动时工具自动降级（只警告不报错）。
+        headHost: 127.0.0.1
+        headPort: 39572
+        headHz: 90          # 30-90
+        headHoldHz: 30      # hold 阶段（呼吸/微动作）维持频率
+        headProbeCacheMs: 5000
+        # null = 自动探测端口占用；true/false = 强制认为驱动在/不在（确定环境下可跳过探测）
+        headDriverAssumed: null
+        headHumanize: true
+        headIdleDrift: true
+        headDriftAmplitude: 0.004
+        headDriftRotationDeg: 0.3
+        headSeed: 1
+
+        # ── 转头（vrchat_look）：auto = A 线可用则真转头，否则 snap turn ──
+        lookMode: auto      # auto|head|snap；兼容旧值 axis/comfort = snap 子模式
+        lookStepDeg: 45
+
+        # ── Phase 1 玩家进程（vrchat_player / vrchat_player_preflight / vrchat_mode）──
+        # playerDir 留空 = 自动探测：包内 player/ → 兄弟目录 vrchat-vr-driver/player → 旧路径。
+        # 只有把配套工程放在奇怪位置时才需要手填（填仓库根或 player 目录都认）。
+        playerDir: ''
+        playerNode: node
+        # 监视器 HTTP 端口（demo.mjs --port）；status 用它读 /health 与 /state
+        playerMonitorPort: 8765
+        # 子进程 stdout/stderr 内存环形缓冲行数（log 工具最多返回这么多）
+        playerLogLines: 300
+
+        # ── 挡位预设（vrchat_mode 用；小白只需要动这一组）──────────────────────
+        # 实机默认感知：off|vision|log|hybrid；vision = 只截图（纯视觉，绝不读日志）
+        playerPerception: vision
+        # 实机默认导航：on|off（A* 绕障）
+        playerNav: on
+        # 空 = player/maps/home.json
+        playerMapPath: ''
+        # player 挡 / demo 挡默认时长（秒）
+        playerDefaultSeconds: 300
+        demoDefaultSeconds: 60
+        # true = player 挡发现 Steam/SteamVR/VRChat 没开时，自动按顺序启动并等待
+        playerAutoLaunch: false
+        # vrchat_doctor 总预算（毫秒）
+        doctorTimeoutMs: 9000
+        # SteamVR 日志路径（驱动探活证据，如 D:\game\steam\logs\vrserver.txt）；空 = 自动找
+        steamVrLogPath: ''
+
+        # ── 虚拟手柄输入（vrchat_ui）：操作 VRChat 菜单/抓取 ───────────────────
+        # 走 VMT 的 /VMT/Input/* 通道；VMT 驱动现在报 knuckles 类型，VRChat 自带 binding 生效
+        vmtInputEnabled: true
+        uiPressMs: 140              # 默认按键按住时长（毫秒）
+        uiReleaseAllOnUnload: true  # 插件卸载时松开所有按键，避免游戏里"键一直按着"
+
+        # ── 截图（vrchat_screenshot）：agent 操作 UI 时的"眼睛" ────────────────
+        screenshotTimeoutMs: 4000
+        screenshotFallbackProcess: VRChat.exe
+
+        # ── 本地按钮控制台（不敲命令行）───────────────────────────────────────
+        # 打开 http://127.0.0.1:8790/ 就是一排按钮：体检/演练/真机/停止/按键/摇杆/截图/装驱动
+        panelEnabled: true
+        panelHost: 127.0.0.1
+        panelPort: 8790
+
+        # ── 驱动随包（drivers/dsh_hmd + drivers/vmt）─────────────────────────
+        # 空 = <插件根>/drivers；面板/工具里的"安装驱动"按钮会跑 drivers/install-drivers.ps1
+        driversDir: ''
+        driversInstallTimeoutMs: 120000

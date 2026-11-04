@@ -1,0 +1,61 @@
+{
+  "name": "dsh-vrchat-vplay",
+  "displayName": "dsh-VRChat-vplay",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Self-contained VRChat OSC bridge + virtual player for DeepSeek Harness with a local button panel: talk through the chatbox, sense avatar parameters, drive OSC input actions, click VRChat menus through virtual knuckles controllers (bundled dsh_hmd + VMT drivers), control head/body pose, and run the Phase 1 virtual player (perception switch, A* navigation, 3D skeleton monitor, watchdog) with a one-knob mode switch and a read-only doctor.",
+  "author": "dsh-VRChat-vplay contributors",
+  "exports": {
+    ".": "./index.js",
+    "./mcp/server": "./mcp/server.mjs",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node tools/plugin-offline-test.mjs && node tools/osc-selftest.mjs && node tools/test_player.mjs",
+    "test:toolset": "node tools/test_toolset.mjs",
+    "test:mcp": "node tools/test_mcp.mjs",
+    "test:vplayd": "node tools/test_vplayd.mjs",
+    "test:aim": "node tools/test_aim.mjs",
+    "mcp": "node mcp/server.mjs",
+    "vplayd": "node tools/vplayd.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "vrchat",
+    "osc",
+    "mcp",
+    "model-context-protocol",
+    "virtual-player",
+    "steamvr",
+    "vmt",
+    "automation",
+    "virtual-controller"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "mcp",
+    "player",
+    "drivers",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "AUP.md",
+    "LICENSE",
+    "docs",
+    "tools/vplayd.mjs"
+  ]
+}
