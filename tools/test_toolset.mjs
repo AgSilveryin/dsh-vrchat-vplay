@@ -4,7 +4,7 @@
 //   1. apply() 被假宿主调用后恰好捕获 19 个工具，名称与插件注册表一致；
 //   2. 每个工具都有 description / JSON-Schema parameters / execute；
 //   3. vrchat_status 在隔离端口上真实可用（listening 端口可探测）；
-//   4. vrchat_screenshot 在没有 SteamVR 时优雅降级（不抛异常，ok:false）；
+//   4. vrchat_screenshot：有 SteamVR 时回合法 PNG 附件，没有时优雅降级（不抛异常）；
 //   5. 附件 saveImage：落盘 + base64 可读，cleanup 删目录；
 //   6. 未知工具抛错；
 //   7. dispose 幂等，且释放 UDP 监听（同端口可再次 bind）与临时附件目录。
@@ -107,10 +107,19 @@ check('bridge 在隔离端口真实监听', listeningOk, `listening=${status.lis
 check('vrchat_status 返回配置端口', status.listenPort === BASE_PORT && status.sendPort === BASE_PORT + 1, `got ${status.listenPort}/${status.sendPort}`);
 check('vrchat_status 含 pose/head/look 分区', 'pose' in status && 'head' in status && 'look' in status);
 
-// ── 3) 截图在无 SteamVR 时优雅降级 ───────────────────────────────────────────
+// ── 3) 截图：有 SteamVR 就真回图，没有就优雅降级（不抛） ─────────────────────
 const shot = await toolset.call('vrchat_screenshot');
-check('vrchat_screenshot 无 SteamVR 时 ok:false 不抛', shot.ok === false && typeof shot.error === 'string' && shot.error.length > 0, JSON.stringify(shot).slice(0, 160));
-check('截图失败时不产生附件', shot.image === null || shot.image === undefined);
+check('vrchat_screenshot 调用不抛（有/无 SteamVR 都优雅）', shot !== null && typeof shot === 'object' && typeof shot.ok === 'boolean', JSON.stringify(shot).slice(0, 160));
+if (shot.ok === true) {
+  check(
+    '截图成功时返回合法尺寸与附件（base64 非空）',
+    Number.isFinite(shot.width) && shot.width > 0 && Number.isFinite(shot.height) && shot.height > 0
+      && typeof shot.image?.data === 'string' && shot.image.data.length > 0,
+    JSON.stringify({ ok: shot.ok, width: shot.width, height: shot.height }).slice(0, 160),
+  );
+} else {
+  check('截图失败时给出错误说明且不产生附件', typeof shot.error === 'string' && shot.error.length > 0 && (shot.image === null || shot.image === undefined), JSON.stringify(shot).slice(0, 160));
+}
 
 // ── 4) 未知工具 ───────────────────────────────────────────────────────────────
 let unknownThrew = false;

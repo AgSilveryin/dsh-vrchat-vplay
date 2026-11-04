@@ -127,10 +127,12 @@ node tools/vplayd.mjs --self-check           # 不动端口：打印 19 工具 +
 - 复用同一套 `apply()` 接线（面板 12 个动作与插件内完全一致），只绑 `127.0.0.1`。
 - 参数、退出码、HTTP/SSE 示例、与 DSH 插件并存的端口表见 **[`docs/DAEMON.md`](docs/DAEMON.md)**。
 
-## 瞄准点击闭环（0.7.0 新增：离线核心 + 真机标定流程）
+## 瞄准点击闭环（0.7.0 新增：离线核心 + 真机伺服）
 
-`lib/aim.mjs` 把"截图里的像素"换算成"手/头的朝向"，并提供点击后的帧差确认：`pixelToAngles` / `anglesToPixel` / `handAimFromTarget` / `framesDiffer` / `planClickSequence`。零依赖、可单测（`node tools/test_aim.mjs`，29 项）。
-注意：真机实测发现 Headset Window 截图是**双眼并排 SBS**（1280×720 = 左右各 640×720），角度必须按**单眼宽度**算。手部激光方向的符号约定与标定步骤见 **[`docs/C-瞄准方案.md`](docs/C-瞄准方案.md)**（未真机标定前不要当已验证结论用）。
+`lib/aim.mjs` 把"截图里的像素"换算成"手/头的朝向"，并提供点击后的帧差确认：`pixelToAngles` / `anglesToPixel` / `handAimFromTarget` / `framesDiffer` / `planClickSequence`（零依赖，`node tools/test_aim.mjs` → 29 项）。
+`lib/laser.mjs` 在真机截图里找**激光射线**并取瞄准端点：`detectLaser` / `fitLineRansac` / `pickFarEndpoint` / `pixelErrorToHandDelta`（`node tools/test_laser.mjs` → 19 项）。
+`tools/aim-servo.mjs` 是**真机视觉伺服**脚本：`--probe` 看激光、`--calibrate` 扫角度网格测增益、`--target 196,575 --click` 伺服到目标像素后扳机点击（每次截图留证）。
+真机实测（2026-11-04）：Headset Window 是**双眼并排 SBS**（1280×720 = 左右各 640×720，角度按单眼宽度算）；激光颜色随背景在 `rgb(95,178,189)`–`rgb(107,229,251)` 间变化；`rotation.yaw +` = 瞄准点往右、`rotation.pitch +` = 往下；一次伺服 4 步收敛到 14 px 并点击成功。**未完成**：连续 5 次选中同一菜单项（快速菜单图标区检测不稳），细节与下一步见 **[`docs/C-瞄准方案.md`](docs/C-瞄准方案.md)** §11。
 
 ---
 

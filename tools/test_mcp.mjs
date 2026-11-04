@@ -423,22 +423,30 @@ async function integrationTests(fakeRepo) {
       assert.match(response.result.content[0].text, /缺少必填参数 text/);
     });
 
-    await check('vrchat_doctor 离线：verdict=not-ready 且不崩', async () => {
+    await check('vrchat_doctor：verdict 合法（离线 not-ready / 真机 player-ready）且不崩', async () => {
       const response = await client.request('tools/call', { name: 'vrchat_doctor', arguments: {} }, 20000);
       assert.equal(response.result.isError, false);
-      assert.equal(response.result.structuredContent.verdict, 'not-ready');
-      assert.equal(response.result.structuredContent.summary.player, false);
+      const verdict = response.result.structuredContent.verdict;
+      // 这个测试既能离线跑（not-ready），也能在 SteamVR/VRChat 正开着时跑（player-ready 等）；
+      // 只要求 verdict 是 doctor 合法档位之一，不绑定某一种环境。
+      assert.ok(['not-ready', 'chat-ready', 'pose-ready', 'player-ready'].includes(verdict), `unexpected verdict: ${verdict}`);
+      assert.equal(typeof response.result.structuredContent.summary.player, 'boolean');
       assert.equal(response.result.content[0].type, 'text');
       assert.ok(response.result.content[0].text.length > 0);
     });
 
-    await check('vrchat_screenshot 离线：isError=false、文本说明、无 image block', async () => {
+    await check('vrchat_screenshot：成功回图或失败优雅降级（视环境）', async () => {
       const response = await client.request('tools/call', { name: 'vrchat_screenshot', arguments: {} }, 20000);
       assert.equal(response.result.isError, false);
-      assert.equal(response.result.structuredContent.ok, false);
-      assert.equal(response.result.content[0].type, 'text');
-      assert.match(response.result.content[0].text, /截图失败/);
-      assert.equal(response.result.content.some((block) => block.type === 'image'), false);
+      const structured = response.result.structuredContent;
+      const hasImage = response.result.content.some((block) => block.type === 'image');
+      if (structured.ok === true) {
+        assert.equal(hasImage, true);
+        assert.ok(Number(structured.width) > 0 && Number(structured.height) > 0);
+      } else {
+        assert.match(response.result.content[0].text, /截图失败/);
+        assert.equal(hasImage, false);
+      }
     });
 
     await check('stdout 只含 JSON-RPC 消息（无 Content-Length / 无日志污染）', () => {

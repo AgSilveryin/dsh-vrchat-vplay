@@ -74,8 +74,10 @@ for (const rel of [
 // 内部待办（docs/发布待办.md）会含开发机路径与未决项，绝不进发布包。
 rmSync(join(staging, 'docs', '发布待办.md'), { force: true });
 
-// 独立 daemon 随包（tools/ 其余是测试/构建脚本，不随包）。
+// 独立 daemon + 真机瞄准工具随包（tools/ 里其余是开发/测试脚本，不随包）。
 copyFile('tools/vplayd.mjs');
+copyFile('tools/aim-servo.mjs');
+copyFile('tools/aim-lab.mjs');
 
 // ── 2. 拷 player/（运行时必需；开发/测试产物排除）───────────────────────────
 const PLAYER_EXCLUDE = new Set(['tests', 'tmp', 'node_modules', '.selftest-recordings', 'shots']);
@@ -114,6 +116,8 @@ const stagedPkg = {
     'LICENSE',
     'docs',
     'tools/vplayd.mjs',
+    'tools/aim-servo.mjs',
+    'tools/aim-lab.mjs',
   ],
   scripts: { test: 'node tools/plugin-offline-test.mjs' },
 };

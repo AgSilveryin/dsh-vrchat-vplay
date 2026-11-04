@@ -25,7 +25,8 @@
     "test:vplayd": "node tools/test_vplayd.mjs",
     "test:aim": "node tools/test_aim.mjs",
     "mcp": "node mcp/server.mjs",
-    "vplayd": "node tools/vplayd.mjs"
+    "vplayd": "node tools/vplayd.mjs",
+    "test:laser": "node tools/test_laser.mjs"
   },
   "keywords": [
     "dsh",
@@ -56,6 +57,8 @@
     "AUP.md",
     "LICENSE",
     "docs",
-    "tools/vplayd.mjs"
+    "tools/vplayd.mjs",
+    "tools/aim-servo.mjs",
+    "tools/aim-lab.mjs"
   ]
 }
