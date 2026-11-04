@@ -6,10 +6,10 @@
 
 `dsh-VRChat-vplay`（包名/目录：`dsh-vrchat-vplay`）是给 **DeepSeek Harness（DSH）** 用的一个 Host 插件：把 agent 接到**本机**运行中的 VRChat，通过 VRChat 官方 **OSC** 接口和 SteamVR **虚拟设备驱动**实现"说话 / 听参数 / 按输入 / 动头动手 / 启动虚拟玩家进程"。
 
-> 自 **0.5.0** 起是**自包含**发布包：插件本体 + 配套 Phase 1 玩家工程（`player/`，含真感知、A* 导航、三维骨架监视器）一起分发；**0.6.0 起连两个 SteamVR 驱动也随包自带**（`drivers/dsh_hmd` + `drivers/vmt` + 安装/卸载脚本），并新增**本地按钮面板**（`http://127.0.0.1:8790/`）——不敲命令行也能体检、切挡、按键、截图、装驱动。
+> 自 **0.5.0** 起是**自包含**发布包：插件本体 + 配套 Phase 1 玩家工程（`player/`，含真感知、A* 导航、三维骨架监视器）一起分发；**0.6.0 起连两个 SteamVR 驱动也随包自带**（`drivers/dsh_hmd` + `drivers/vmt` + 安装/卸载脚本），并新增**本地按钮面板**（`http://127.0.0.1:8790/`）——不敲命令行也能体检、切挡、按键、截图、装驱动；**0.7.0 起 19 个能力可脱离 DSH 使用**——内置 **MCP stdio 服务器**（`mcp/server.mjs`，任意 MCP 宿主可用）+ **独立 daemon**（`tools/vplayd.mjs`，不开 DSH 也能起面板），并修复了"有窗口盖住 SteamVR Headset Window 时截到错误画面"的问题。
 >
 > 中文为主；文末有 ≤120 词的 English summary。
-> 版本 **0.6.0** · 最后更新 **2026-11-02** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
+> 版本 **0.7.0** · 最后更新 **2026-11-04** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
 
 ---
 
@@ -95,6 +95,45 @@ http://127.0.0.1:8790/
 
 ---
 
+## 给非 DSH 宿主：MCP 服务器（0.7.0 新增）
+
+`mcp/server.mjs` 是一个**零依赖的 MCP stdio 服务器**，把 19 个 `vrchat_*` 能力以 MCP tools 暴露给 Claude Desktop / Cursor / 任意 MCP 宿主。它不复制工具逻辑——通过 `lib/host-shim.mjs` 直接复用本插件 `index.js` 注册的同一份工具定义（schema/描述/执行完全一致）。
+
+```jsonc
+// claude_desktop_config.json / .cursor/mcp.json
+{
+  "mcpServers": {
+    "vrchat-vplay": {
+      "command": "node",
+      "args": ["<本插件目录>/mcp/server.mjs",
+               "--config", "{\"listenEnabled\":false,\"panelEnabled\":false}"],
+      "env": { "VPLAY_CONFIG": "{\"playerDir\":\"<配套 player 的父目录>\"}" }
+    }
+  }
+}
+```
+
+- 详细配置（各宿主写法、19 工具对照、config 键、中文路径、已知限制）见 **[`docs/MCP.md`](docs/MCP.md)**。
+- 默认 `panelEnabled:false`（避免和 DSH 插件抢 8790）；同一台机器上 DSH 插件与 MCP **只能有一方反向监听 9001**（VRChat 参数事件是单播），发送/截图/按键不受影响。
+
+## 独立 daemon：不开 DSH 也能用（0.7.0 新增）
+
+```powershell
+node tools/vplayd.mjs                        # 起本地面板 http://127.0.0.1:8790/
+node tools/vplayd.mjs --panel-port 8791 --no-listen   # 和 DSH 插件同时开时（避免端口冲突）
+node tools/vplayd.mjs --self-check           # 不动端口：打印 19 工具 + 体检结论
+```
+
+- 复用同一套 `apply()` 接线（面板 12 个动作与插件内完全一致），只绑 `127.0.0.1`。
+- 参数、退出码、HTTP/SSE 示例、与 DSH 插件并存的端口表见 **[`docs/DAEMON.md`](docs/DAEMON.md)**。
+
+## 瞄准点击闭环（0.7.0 新增：离线核心 + 真机标定流程）
+
+`lib/aim.mjs` 把"截图里的像素"换算成"手/头的朝向"，并提供点击后的帧差确认：`pixelToAngles` / `anglesToPixel` / `handAimFromTarget` / `framesDiffer` / `planClickSequence`。零依赖、可单测（`node tools/test_aim.mjs`，29 项）。
+注意：真机实测发现 Headset Window 截图是**双眼并排 SBS**（1280×720 = 左右各 640×720），角度必须按**单眼宽度**算。手部激光方向的符号约定与标定步骤见 **[`docs/C-瞄准方案.md`](docs/C-瞄准方案.md)**（未真机标定前不要当已验证结论用）。
+
+---
+
 ## 安装 / 启用
 
 这是 **DSH Host bundle**：`package.json` 里声明
@@ -116,7 +155,7 @@ target: <本插件目录>        # 含 package.json 的那一层：解包后的 
 
 # A2. 或指向发布 tgz（不用解包）
 action: install_bundle
-target: <本插件目录>/dist/dsh-vrchat-vplay-0.6.0.tgz    # 打好的包在 dist/ 下
+target: <本插件目录>/dist/dsh-vrchat-vplay-0.7.0.tgz    # 打好的包在 dist/ 下
 ```
 
 `install_bundle` 会把包登记到当前 profile（依赖 + bundle 列表）并持久化；装完重启 DSH（或等热加载）后，每个 agent 的工具列表里会出现 `vrchat_*`（19 个）。
