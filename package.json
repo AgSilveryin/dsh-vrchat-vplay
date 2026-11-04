@@ -26,7 +26,8 @@
     "test:aim": "node tools/test_aim.mjs",
     "mcp": "node mcp/server.mjs",
     "vplayd": "node tools/vplayd.mjs",
-    "test:laser": "node tools/test_laser.mjs"
+    "test:laser": "node tools/test_laser.mjs",
+    "test:aim3d": "node tools/test_aim3d.mjs"
   },
   "keywords": [
     "dsh",

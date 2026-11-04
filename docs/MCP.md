@@ -25,7 +25,7 @@ tools/
 ```powershell
 cd D:\中转站API\dsh-vrchat-vplay
 
-# 自测：24 项全绿（协议纯函数 + 真子进程握手/工具清单/错误/离线降级/退出码）
+# 自测：25 项全绿（协议纯函数 + 真子进程握手/工具清单/错误/在线与离线降级/退出码）
 node tools/test_mcp.mjs
 
 # 手工发一条 initialize 看响应（发完 stdin 关闭，服务器 dispose 后 exit 0）
@@ -35,6 +35,28 @@ node tools/test_mcp.mjs
 
 > 直接 `node mcp/server.mjs` 会一直等 stdin（这是 MCP 服务器正常的等待状态）。
 > `--help` / `--version` 的输出也走 stderr，不污染协议通道。
+
+### 1.1 官方 SDK 兼容性验证（2026-11-04 实测，独立于自测客户端）
+
+用官方 `@modelcontextprotocol/sdk` 当客户端（临时目录安装，**不污染本包的零依赖**）连本服务器，实测通过：
+
+| 步骤 | 结果 |
+|---|---|
+| `initialize` | `serverInfo = {"name":"dsh-vrchat-vplay-mcp","version":"0.7.0"}` |
+| `tools/list` | **19** 个，全部有 `inputSchema.type=object` |
+| `vrchat_status` | `isError=false`，text |
+| `vrchat_doctor` | `isError=false`，text（当时真机 `player-ready`） |
+| `vrchat_screenshot` | `isError=false`，**image/png content**，base64 约 1.72 MB |
+| `vrchat_ui openQuickMenu` | `isError=false`，text「按键：左手 b 按下 140ms」 |
+
+复跑方式（临时目录，任意位置；npm 源可用 npmmirror）：
+
+```powershell
+mkdir $env:TEMP\mcp-sdk-check; cd $env:TEMP\mcp-sdk-check
+'{"name":"mcp-sdk-check","private":true,"type":"module"}' | Set-Content package.json
+npm --registry=https://registry.npmmirror.com install @modelcontextprotocol/sdk
+# 写一个 Client + StdioClientTransport 脚本，command=node，args=[<插件目录>/mcp/server.mjs, '--config', '{"listenEnabled":false,"panelEnabled":false}']
+```
 
 ---
 

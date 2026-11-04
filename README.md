@@ -133,6 +133,7 @@ node tools/vplayd.mjs --self-check           # 不动端口：打印 19 工具 +
 `lib/laser.mjs` 在真机截图里找**激光射线**并取瞄准端点：`detectLaser` / `fitLineRansac` / `pickFarEndpoint` / `pixelErrorToHandDelta`（`node tools/test_laser.mjs` → 19 项）。
 `tools/aim-servo.mjs` 是**真机视觉伺服**脚本：`--probe` 看激光、`--calibrate` 扫角度网格测增益、`--target 196,575 --click` 伺服到目标像素后扳机点击（每次截图留证）。
 `tools/aim-hover.mjs` 是**菜单状态/悬停扫描脚手架**：`--scan` 网格扫描，`--click --pose yaw,pitch` 单点，`--repeat 5 --pose ...` 连续验收；内置"暗蓝面板像素比例"检测菜单开关（关≈0.005 / 开≈0.234），并保证**左手一直发流**（否则挂在左手的快捷菜单会消失）。
+`lib/aim3d.mjs` 是**3D 瞄准几何**：角度↔方向、射线-平面求交、由"手位置→目标点"反解 yaw/pitch（`node tools/test_aim3d.mjs` → 26 项）；用于"右手射线是否真的打中左手菜单平面"这类 2D 像素无法判定的事（菜单偏移/倾角需真机标定）。
 真机实测（2026-11-04）：Headset Window 是**双眼并排 SBS**（1280×720 = 左右各 640×720，角度按单眼宽度算）；激光颜色随背景在 `rgb(95,178,189)`–`rgb(107,229,251)` 间变化；`rotation.yaw +` = 瞄准点往右、`rotation.pitch +` = 往下；一次伺服 4 步收敛到 14 px 并点击成功。**未完成**：连续 5 次选中同一菜单项——第二轮排查确认卡在"2D 激光端点对准 ≠ 3D 射线打中 UI 面板"（VRChat 绑定里 interact 确实绑的是模拟扳机），需要几何法/反馈法；细节与下一步见 **[`docs/C-瞄准方案.md`](docs/C-瞄准方案.md)** §11。
 
 ---
