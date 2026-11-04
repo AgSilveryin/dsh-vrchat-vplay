@@ -59,6 +59,7 @@
     "docs",
     "tools/vplayd.mjs",
     "tools/aim-servo.mjs",
-    "tools/aim-lab.mjs"
+    "tools/aim-lab.mjs",
+    "tools/aim-hover.mjs"
   ]
 }

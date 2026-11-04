@@ -70,8 +70,16 @@ async function setHead(pitch = HEAD_PITCH, yaw = HEAD_YAW) {
   const result = await ts.call('vrchat_head', { target: { y: 1.6 }, rotation: { yaw, pitch, roll: 0 }, durationMs: 250, wait: true, hold: true });
   return result;
 }
+/** 右手指向；左手必须一直跟随发流，否则 VMT 左手失效 → 挂在左手的快捷菜单会消失。 */
 async function setHand(yaw, pitch) {
-  const result = await ts.call('vrchat_pose', { hand: 'right', target: HAND_BASE, rotation: { yaw, pitch, roll: 0 }, durationMs: 250, wait: true, hold: true });
+  const result = await ts.call('vrchat_pose', {
+    hand: 'both',
+    left: { target: { x: -0.32, y: 1.3, z: 0.35 }, rotation: { yaw: 10, pitch: -20, roll: 0 } },
+    right: { target: HAND_BASE, rotation: { yaw, pitch, roll: 0 } },
+    durationMs: 250,
+    wait: true,
+    hold: true,
+  });
   return result;
 }
 /** 抓一张原始帧（RGBＡ + 路径）；不在这里做检测，方便先取参考帧。 */
