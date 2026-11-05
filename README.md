@@ -158,9 +158,9 @@ node tools/vplayd.mjs --self-check           # 不动端口：打印 19 工具 +
 action: install_bundle
 target: <本插件目录>        # 含 package.json 的那一层：解包后的 package/，或本仓库目录
 
-# A2. 或指向发布 tgz（不用解包）
+# A2. 或指向发布 tgz（不用解包；tgz 就是别人下载到的那个文件）
 action: install_bundle
-target: <本插件目录>/dist/dsh-vrchat-vplay-0.7.0.tgz    # 打好的包在 dist/ 下
+target: <tgz 所在目录>/dsh-vrchat-vplay-0.7.0.tgz
 ```
 
 `install_bundle` 会把包登记到当前 profile（依赖 + bundle 列表）并持久化；装完重启 DSH（或等热加载）后，每个 agent 的工具列表里会出现 `vrchat_*`（19 个）。
