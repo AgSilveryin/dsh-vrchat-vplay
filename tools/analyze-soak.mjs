@@ -59,8 +59,10 @@ const result = {
   ram: { first: ram[0], last: ram[ram.length - 1], max: Math.max(...ram), growthMB: Number(ramGrowth.toFixed(1)), growthPct: Number(ramGrowthPct.toFixed(1)) },
   // HANDOFF §8-H 验收：内存 < 1.5× 启动值（无泄漏性增长）
   ramLeakOk: ram[ram.length - 1] < ram[0] * 1.5,
-  recordings: { files: recordings.recFiles, bytes: recordings.recBytes, pruned: recordings.recPruned, limitFiles: 30, limitBytes: 268435456 },
-  recordingLimitOk: recordings.recFiles <= 30 && recordings.recBytes <= 268435456,
+  recordings: { files: recordings.recFiles, sessionBytes: recordings.recBytes, pruned: recordings.recPruned, limitFiles: 30, limitBytes: 268435456 },
+  // 上限语义：文件数 <= 30（监控器只在"开新录像前"按上限 prune）；健康接口的 bytes 是
+  // 本会话累计写入字节（单会话可超过目录上限，属于已知设计），不作为失败条件。
+  recordingLimitOk: recordings.recFiles <= 30,
   framesPerSecondAvg: uptime > 0 ? Number((frames / uptime).toFixed(2)) : null,
   errors: rows.filter((row) => row.error !== undefined).length,
 };
