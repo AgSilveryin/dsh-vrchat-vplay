@@ -79,6 +79,7 @@ copyFile('tools/vplayd.mjs');
 copyFile('tools/aim-servo.mjs');
 copyFile('tools/aim-lab.mjs');
 copyFile('tools/aim-hover.mjs');
+copyFile('tools/aim-click-accept.mjs');
 
 // ── 2. 拷 player/（运行时必需；开发/测试产物排除）───────────────────────────
 const PLAYER_EXCLUDE = new Set(['tests', 'tmp', 'node_modules', '.selftest-recordings', 'shots']);
@@ -120,6 +121,7 @@ const stagedPkg = {
     'tools/aim-servo.mjs',
     'tools/aim-lab.mjs',
     'tools/aim-hover.mjs',
+    'tools/aim-click-accept.mjs',
   ],
   scripts: { test: 'node tools/plugin-offline-test.mjs' },
 };
