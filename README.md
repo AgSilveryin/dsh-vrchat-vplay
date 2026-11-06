@@ -9,7 +9,8 @@
 > 自 **0.5.0** 起是**自包含**发布包：插件本体 + 配套 Phase 1 玩家工程（`player/`，含真感知、A* 导航、三维骨架监视器）一起分发；**0.6.0 起连两个 SteamVR 驱动也随包自带**（`drivers/dsh_hmd` + `drivers/vmt` + 安装/卸载脚本），并新增**本地按钮面板**（`http://127.0.0.1:8790/`）——不敲命令行也能体检、切挡、按键、截图、装驱动；**0.7.0 起 19 个能力可脱离 DSH 使用**——内置 **MCP stdio 服务器**（`mcp/server.mjs`，任意 MCP 宿主可用）+ **独立 daemon**（`tools/vplayd.mjs`，不开 DSH 也能起面板），并修复了"有窗口盖住 SteamVR Headset Window 时截到错误画面"的问题。
 >
 > 中文为主；文末有 ≤120 词的 English summary。
-> 版本 **0.7.0** · 最后更新 **2026-11-04** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
+> 版本 **0.7.0** · 最后更新 **2026-11-06** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
+> 仓库 / Issues：**https://github.com/AgSilveryin/dsh-vrchat-vplay**
 
 ---
 
@@ -424,8 +425,8 @@ node tools/smoke-staged.mjs <包根>      # 从打好的包里装载插件：19 
 
 ## 反馈
 
-- Issues / Discussions：**待开启**（占位）。
-- 想先看内部实测记录：配套工程 `docs/可行性调研.md` §8（Phase 0/1 实测）与 `player/README.md`、`player/docs/Phase1-实现说明.md`。
+- 仓库 / Issues：**https://github.com/AgSilveryin/dsh-vrchat-vplay** —— 问题、提问、误报都请开 Issues（AUP 举报同此入口）。
+- 想先看内部实测记录：配套工程 `vrchat-vr-driver`（**未单独开源**，源码快照见 Release 附件）里的 `docs/可行性调研.md` §8（Phase 0/1 实测）；包内另有 `player/README.md`、`player/docs/Phase1-实现说明.md`。
 
 ---
 

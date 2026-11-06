@@ -7,6 +7,14 @@
   "license": "MIT",
   "description": "Self-contained VRChat OSC bridge + virtual player for DeepSeek Harness with a local button panel: talk through the chatbox, sense avatar parameters, drive OSC input actions, click VRChat menus through virtual knuckles controllers (bundled dsh_hmd + VMT drivers), control head/body pose, and run the Phase 1 virtual player (perception switch, A* navigation, 3D skeleton monitor, watchdog) with a one-knob mode switch and a read-only doctor.",
   "author": "dsh-VRChat-vplay contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgSilveryin/dsh-vrchat-vplay.git"
+  },
+  "homepage": "https://github.com/AgSilveryin/dsh-vrchat-vplay#readme",
+  "bugs": {
+    "url": "https://github.com/AgSilveryin/dsh-vrchat-vplay/issues"
+  },
   "exports": {
     ".": "./index.js",
     "./mcp/server": "./mcp/server.mjs",
