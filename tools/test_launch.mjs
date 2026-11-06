@@ -36,7 +36,7 @@ const check = async (name, fn) => {
 const sleep = () => new Promise((resolve) => setImmediate(resolve));
 const norm = (p) => String(p).replace(/\//g, '\\').toLowerCase();
 
-const STEAM_DIR = 'D:\\game\\steam';
+const STEAM_DIR = 'C:\\Program Files (x86)\\Steam';
 const STEAM_EXE = STEAM_DIR + '\\steam.exe';
 const STEAMVR_DIR = STEAM_DIR + '\\steamapps\\common\\SteamVR';
 const STEAMVR_EXE = STEAMVR_DIR + '\\bin\\win64\\vrstartup.exe';
@@ -47,7 +47,7 @@ const VDF = [
   '{',
   '\t"0"',
   '\t{',
-  '\t\t"path"\t\t"D:\\\\game\\\\steam"',
+  '\t\t"path"\t\t"C:\\\\Program Files (x86)\\\\Steam"',
   '\t}',
   '}',
 ].join('\n');
@@ -79,7 +79,7 @@ function makeFakeDeps(cfg = {}) {
     },
     regQuery: (key, name) => {
       if (cfg.regQuery) return cfg.regQuery(key, name);
-      if (String(name).toLowerCase() === 'steampath') return cfg.steamPath === undefined ? 'd:/game/steam' : cfg.steamPath;
+      if (String(name).toLowerCase() === 'steampath') return cfg.steamPath === undefined ? 'C:/Program Files (x86)/Steam' : cfg.steamPath;
       return null;
     },
     listProcesses: () => procs.map((p) => ({ ...p })),
@@ -124,16 +124,16 @@ function baseFiles() {
 async function main() {
   // ── ⑤/归一化：VDF 解析与路径归一化 ─────────────────────────────────────
   await check('normalizeWinPath: 正斜杠 → 反斜杠 + 盘符大写', () => {
-    assert.equal(normalizeWinPath('d:/game/steam'), 'D:\\game\\steam');
-    assert.equal(normalizeWinPath('  D:\\game\\steam\\  '), 'D:\\game\\steam');
+    assert.equal(normalizeWinPath('C:/Program Files (x86)/Steam'), 'C:\\Program Files (x86)\\Steam');
+    assert.equal(normalizeWinPath('  C:\\Program Files (x86)\\Steam\\  '), 'C:\\Program Files (x86)\\Steam');
     assert.equal(normalizeWinPath(''), '');
     assert.equal(normalizeWinPath(null), '');
   });
   await check('parseLibraryFolders: 解析转义路径', () => {
     const libs = parseLibraryFolders(VDF);
-    assert.deepEqual(libs, ['D:\\game\\steam']);
-    const multi = parseLibraryFolders('"0" { "path" "D:\\\\game\\\\steam" } "1" { "path" "E:\\\\SteamLibrary" }');
-    assert.deepEqual(multi, ['D:\\game\\steam', 'E:\\SteamLibrary']);
+    assert.deepEqual(libs, ['C:\\Program Files (x86)\\Steam']);
+    const multi = parseLibraryFolders('"0" { "path" "C:\\\\Program Files (x86)\\\\Steam" } "1" { "path" "E:\\\\SteamLibrary" }');
+    assert.deepEqual(multi, ['C:\\Program Files (x86)\\Steam', 'E:\\SteamLibrary']);
   });
   await check('常量形状', () => {
     assert.deepEqual([...GAME_ORDER], ['steam', 'steamvr', 'vrchat']);
@@ -144,10 +144,10 @@ async function main() {
 
   // ── 探测：主库 ──────────────────────────────────────────────────────────
   await check('detectGameEnv: 主库三件套都能找到', () => {
-    const { deps } = makeFakeDeps({ files: baseFiles(), steamPath: 'd:/game/steam', textFiles: { [norm(STEAM_DIR + '\\steamapps\\libraryfolders.vdf')]: VDF } });
+    const { deps } = makeFakeDeps({ files: baseFiles(), steamPath: 'C:/Program Files (x86)/Steam', textFiles: { [norm(STEAM_DIR + '\\steamapps\\libraryfolders.vdf')]: VDF } });
     const env = detectGameEnv(deps);
     assert.equal(env.steam.found, true);
-    assert.equal(env.steam.path, 'D:\\game\\steam');
+    assert.equal(env.steam.path, 'C:\\Program Files (x86)\\Steam');
     assert.equal(env.steam.exe, STEAM_EXE);
     assert.equal(env.steamvr.found, true);
     assert.equal(env.steamvr.exe, STEAMVR_EXE);
@@ -163,10 +163,10 @@ async function main() {
     const lib2 = 'E:\\SteamLibrary';
     const steamvr2 = lib2 + '\\steamapps\\common\\SteamVR\\bin\\win64\\vrstartup.exe';
     const vrchat2 = lib2 + '\\steamapps\\common\\VRChat\\launch.exe';
-    const multiVdf = '"libraryfolders"\n{\n "0" { "path" "D:\\\\game\\\\steam" }\n "1" { "path" "E:\\\\SteamLibrary" }\n}';
+    const multiVdf = '"libraryfolders"\n{\n "0" { "path" "C:\\\\Program Files (x86)\\\\Steam" }\n "1" { "path" "E:\\\\SteamLibrary" }\n}';
     const { deps } = makeFakeDeps({
       files: [STEAM_EXE, steamvr2, vrchat2, STEAM_DIR + '\\steamapps\\libraryfolders.vdf'],
-      steamPath: 'd:/game/steam',
+      steamPath: 'C:/Program Files (x86)/Steam',
       textFiles: { [norm(STEAM_DIR + '\\steamapps\\libraryfolders.vdf')]: multiVdf },
     });
     const env = detectGameEnv(deps);
@@ -344,7 +344,7 @@ async function main() {
       listProcesses: () => { throw new Error('tasklist boom'); },
       exists: () => true,
       readText: () => null,
-      regQuery: () => 'd:/game/steam',
+      regQuery: () => 'C:/Program Files (x86)/Steam',
       spawn: () => ({ pid: 1 }),
       sleep: async () => { /* noop */ },
     };
@@ -356,16 +356,16 @@ async function main() {
   });
 
   // ── ⑥ 完整环境模拟本机路径（只探测，验证实机事实）──────────────────────
-  await check('detectGameEnv: 模拟本机实机路径（D:/game/steam）', () => {
+  await check('detectGameEnv: 模拟标准 Steam 安装路径（C:/Program Files (x86)/Steam）', () => {
     const { deps } = makeFakeDeps({
       files: baseFiles(),
-      steamPath: 'd:/game/steam',
+      steamPath: 'C:/Program Files (x86)/Steam',
       textFiles: { [norm(STEAM_DIR + '\\steamapps\\libraryfolders.vdf')]: VDF },
     });
     const env = detectGameEnv(deps);
-    assert.equal(env.steam.path, 'D:\\game\\steam');
-    assert.equal(env.steamvr.exe, 'D:\\game\\steam\\steamapps\\common\\SteamVR\\bin\\win64\\vrstartup.exe');
-    assert.equal(env.vrchat.exe, 'D:\\game\\steam\\steamapps\\common\\VRChat\\launch.exe');
+    assert.equal(env.steam.path, 'C:\\Program Files (x86)\\Steam');
+    assert.equal(env.steamvr.exe, 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\bin\\win64\\vrstartup.exe');
+    assert.equal(env.vrchat.exe, 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\VRChat\\launch.exe');
   });
 
   console.log(`PASS ${n} checks (launch)`);

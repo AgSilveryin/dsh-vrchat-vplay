@@ -74,7 +74,7 @@
         playerAutoLaunch: false
         # vrchat_doctor 总预算（毫秒）
         doctorTimeoutMs: 9000
-        # SteamVR 日志路径（驱动探活证据，如 D:\game\steam\logs\vrserver.txt）；空 = 自动找
+        # SteamVR 日志路径（驱动探活证据，如 <Steam 安装目录>\logs\vrserver.txt）；空 = 自动找
         steamVrLogPath: ''
 
         # ── 虚拟手柄输入（vrchat_ui）：操作 VRChat 菜单/抓取 ───────────────────

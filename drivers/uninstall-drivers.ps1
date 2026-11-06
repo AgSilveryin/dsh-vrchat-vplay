@@ -5,7 +5,7 @@
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall-drivers.ps1
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall-drivers.ps1 -WhatIf
-#   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall-drivers.ps1 -SteamPath "D:\game\steam"
+#   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall-drivers.ps1 -SteamPath "<Steam 安装目录>"
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall-drivers.ps1 -DeleteFiles
 #
 # Behaviour:

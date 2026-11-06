@@ -30,7 +30,7 @@ const HELP = `dsh-vrchat-vplay MCP 服务器（stdio，换行分隔 JSON-RPC）
   playerDir 留空 = 自动探测（插件自带 player/ → 兄弟工程 vrchat-vr-driver/player）
 
 示例:
-  node mcp/server.mjs --config '{"listenEnabled":true,"playerDir":"D:/中转站API/vrchat-vr-driver"}'
+  node mcp/server.mjs --config '{"listenEnabled":true,"playerDir":"<配套工程目录>"}'
 
 本进程自己不该被终端直接使用：请配置到 MCP 宿主里（见 docs/MCP.md）。
 `;

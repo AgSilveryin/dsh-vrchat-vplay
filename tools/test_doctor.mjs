@@ -139,8 +139,8 @@ await check('player 缺失 + 端口被占 → pose-ready；nextSteps 含 playerD
   const report = await runDoctor(CONFIG, fakeDeps({
     resolvePaths: () => ({
       found: false,
-      demoPath: 'D:/中转站API/vrchat-vr-driver/player/demo.mjs',
-      root: 'D:/中转站API/vrchat-vr-driver',
+      demoPath: 'D:/tmp/vrchat-vr-driver/player/demo.mjs',
+      root: 'D:/tmp/vrchat-vr-driver',
       source: 'missing',
     }),
     listProcesses: () => ALL_PROCESSES,

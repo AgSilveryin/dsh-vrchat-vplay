@@ -1,7 +1,7 @@
 // test_panel.mjs — 本地按钮控制台单测（真实 HTTP + 注入回调；纯离线，端口 18791/18792）
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { PANEL_ACTIONS, PANEL_KEYS, PANEL_PRESETS, PANEL_SIDES, createPanel } from '../lib/panel.mjs';
+import { PANEL_ACTIONS, PANEL_KEYS, PANEL_PRESETS, PANEL_SIDES, createPanel, isLoopbackHost, isLoopbackOrigin } from '../lib/panel.mjs';
 
 let n = 0;
 const check = async (name, fn) => {
@@ -60,6 +60,19 @@ const panel = createPanel({
 let baseUrl = null;
 let dummy = null;
 
+/** 用原始 http.request 发请求，才能伪造 Host 头（fetch 不允许改 Host）。 */
+const rawRequest = (port, { method = 'GET', path = '/', host, headers = {}, body = null } = {}) => new Promise((resolve, reject) => {
+  const req = http.request({ host: '127.0.0.1', port, method, path, headers: { ...(host ? { host } : {}), ...headers } }, (res) => {
+    let text = '';
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => { text += chunk; });
+    res.on('end', () => resolve({ status: res.statusCode, text }));
+  });
+  req.on('error', reject);
+  if (body !== null) req.write(body);
+  req.end();
+});
+
 try {
   await check('start()：监听 127.0.0.1:18791，返回 usable/url/port', async () => {
     const started = await panel.start();
@@ -98,6 +111,45 @@ try {
     assert.deepEqual(payload.player, { running: false, pid: null, monitor: { ok: false } });
     assert.equal(payload.config.playerMonitorPort, 8765);
     assert.ok(Array.isArray(payload.recent));
+  });
+
+  await check('Host/Origin 校验函数：只认回环地址', async () => {
+    assert.equal(isLoopbackHost('127.0.0.1:18791'), true);
+    assert.equal(isLoopbackHost('localhost:18791'), true);
+    assert.equal(isLoopbackHost('evil.example:18791'), false);
+    assert.equal(isLoopbackHost('127.0.0.1.evil.example'), false);
+    assert.equal(isLoopbackOrigin('http://127.0.0.1:18791'), true);
+    assert.equal(isLoopbackOrigin('https://localhost'), true);
+    assert.equal(isLoopbackOrigin('https://evil.example'), false);
+    assert.equal(isLoopbackOrigin('null'), false);
+  });
+
+  await check('CSRF 防线：外部 Origin 的 GET/POST → 403；本机 Origin → 放行', async () => {
+    const evilStatus = await fetch(`${baseUrl}api/status`, { headers: { origin: 'https://evil.example' } });
+    assert.equal(evilStatus.status, 403);
+    const evilAction = await fetch(`${baseUrl}api/action`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: 'https://evil.example' },
+      body: JSON.stringify({ name: 'doctor', args: {} }),
+    });
+    assert.equal(evilAction.status, 403);
+    const goodStatus = await fetch(`${baseUrl}api/status`, { headers: { origin: 'http://127.0.0.1:18791' } });
+    assert.equal(goodStatus.status, 200);
+  });
+
+  await check('DNS rebinding 防线：Host 不是回环地址 → 403', async () => {
+    const get = await rawRequest(18791, { path: '/api/status', host: 'evil.example:18791' });
+    assert.equal(get.status, 403);
+    const post = await rawRequest(18791, {
+      method: 'POST',
+      path: '/api/action',
+      host: 'evil.example:18791',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'doctor', args: {} }),
+    });
+    assert.equal(post.status, 403);
+    const ok = await rawRequest(18791, { path: '/api/status', host: '127.0.0.1:18791' });
+    assert.equal(ok.status, 200);
   });
 
   await check('POST /api/action：未知 action 返回 400', async () => {

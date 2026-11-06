@@ -12,7 +12,7 @@
 export const JSONRPC_VERSION = '2.0';
 
 /** 服务器身份：MCP initialize 会原样回给客户端。 */
-export const SERVER_INFO = Object.freeze({ name: 'dsh-vrchat-vplay-mcp', version: '0.7.0' });
+export const SERVER_INFO = Object.freeze({ name: 'dsh-vrchat-vplay-mcp', version: '0.7.1' });
 
 /** 支持的 MCP 协议版本（新的在前）；握手时未知版本回最新支持版本。 */
 export const PROTOCOL_VERSIONS = Object.freeze(['2025-06-18', '2025-03-26', '2024-11-05']);

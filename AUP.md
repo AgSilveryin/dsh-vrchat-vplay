@@ -1,7 +1,7 @@
 # 可接受使用政策（AUP） / Acceptable Use Policy
 
 > 项目：`dsh-VRChat-vplay`（包名/目录：`dsh-vrchat-vplay`）
-> 版本：0.7.0　生效/最后更新：2026-11-04
+> 版本：0.7.1　生效/最后更新：2026-11-06
 > 适用对象：本项目全部代码、驱动、脚本、文档与示例，以及它们的修改版/衍生版。
 > 本文档**不是法律意见**，也不构成法律建议；如需更强法律约束，请咨询专业律师。
 > English summary is at the end of this file.

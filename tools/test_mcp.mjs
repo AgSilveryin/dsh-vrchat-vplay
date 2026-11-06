@@ -161,7 +161,7 @@ async function protocolTests() {
     const result = proto.buildInitializeResult('2024-11-05');
     assert.equal(result.protocolVersion, '2024-11-05');
     assert.equal(result.capabilities.tools.listChanged, false);
-    assert.deepEqual(result.serverInfo, { name: 'dsh-vrchat-vplay-mcp', version: '0.7.0' });
+    assert.deepEqual(result.serverInfo, { name: 'dsh-vrchat-vplay-mcp', version: '0.7.1' });
     assert.equal(typeof result.instructions, 'string');
   });
 
@@ -356,7 +356,7 @@ async function integrationTests(fakeRepo) {
       });
       assert.equal(response.jsonrpc, '2.0');
       assert.equal(response.result.protocolVersion, '2025-03-26');
-      assert.deepEqual(response.result.serverInfo, { name: 'dsh-vrchat-vplay-mcp', version: '0.7.0' });
+      assert.deepEqual(response.result.serverInfo, { name: 'dsh-vrchat-vplay-mcp', version: '0.7.1' });
       assert.equal(response.result.capabilities.tools.listChanged, false);
     });
 

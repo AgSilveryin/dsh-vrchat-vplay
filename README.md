@@ -9,7 +9,7 @@
 > 自 **0.5.0** 起是**自包含**发布包：插件本体 + 配套 Phase 1 玩家工程（`player/`，含真感知、A* 导航、三维骨架监视器）一起分发；**0.6.0 起连两个 SteamVR 驱动也随包自带**（`drivers/dsh_hmd` + `drivers/vmt` + 安装/卸载脚本），并新增**本地按钮面板**（`http://127.0.0.1:8790/`）——不敲命令行也能体检、切挡、按键、截图、装驱动；**0.7.0 起 19 个能力可脱离 DSH 使用**——内置 **MCP stdio 服务器**（`mcp/server.mjs`，任意 MCP 宿主可用）+ **独立 daemon**（`tools/vplayd.mjs`，不开 DSH 也能起面板），并修复了"有窗口盖住 SteamVR Headset Window 时截到错误画面"的问题。
 >
 > 中文为主；文末有 ≤120 词的 English summary。
-> 版本 **0.7.0** · 最后更新 **2026-11-06** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
+> 版本 **0.7.1** · 最后更新 **2026-11-06** · 许可 **MIT**（`LICENSE`）· 使用政策 **`AUP.md`**
 > 仓库 / Issues：**https://github.com/AgSilveryin/dsh-vrchat-vplay**
 
 ---
@@ -161,7 +161,7 @@ target: <本插件目录>        # 含 package.json 的那一层：解包后的 
 
 # A2. 或指向发布 tgz（不用解包；tgz 就是别人下载到的那个文件）
 action: install_bundle
-target: <tgz 所在目录>/dsh-vrchat-vplay-0.7.0.tgz
+target: <tgz 所在目录>/dsh-vrchat-vplay-0.7.1.tgz
 ```
 
 `install_bundle` 会把包登记到当前 profile（依赖 + bundle 列表）并持久化；装完重启 DSH（或等热加载）后，每个 agent 的工具列表里会出现 `vrchat_*`（19 个）。
@@ -386,6 +386,8 @@ vrchat_screenshot                       # 再看：点中了没有
 - **chatbox 限制**：有字符/行数上限与发送冷却（插件已分段+排队，默认 1.5s/条）。
 - **头部探活启发式**：见 §依赖与降级 的 `SO_REUSEADDR` 误判说明。
 - **与旧版迁移**：旧插件（包名 `dsh-vrchat-osc`、目录 `<工作目录>\vrchat-osc-plugin`）与本包**二选一**；两份同时启用会注册两套 `vrchat_*` 工具（同名冲突）。迁移步骤：停用旧 bundle → 按 §安装 启用本包 → 重启 DSH。
+- **隐私：画面和日志会发给模型**：调用 `vrchat_screenshot` 时，SteamVR Headset Window 的画面会作为工具结果发送给模型服务方；`perception:"log"` 模式会读 VRChat 的 `output_log_*.txt`（含他人显示名、世界名）并把命中片段交给模型。介意就用 `perception:"off"` 并避免截图。
+- **驱动是预编译闭源二进制**：`drivers/dsh_hmd`、`drivers/vmt` 只随包分发 DLL，**没有源码**（源码是作者私有工程，不在本仓库）；装驱动等于信任作者。`dsh_hmd` 的 manifest 是 `alwaysActivate:true` + `hmd_presence:["*.*"]`，会**对所有 VR 应用生效**——装有真头显的机器上可能和真 HMD 抢位置，装之前先看 `docs/原理与用法.md` 的驱动说明。
 
 ---
 
@@ -417,7 +419,7 @@ node tools/smoke-staged.mjs <包根>      # 从打好的包里装载插件：19 
 
 - 代码许可：**MIT**（`LICENSE`，随仓库发布）。
 - 使用政策（可接受使用政策）：**[`AUP.md`](AUP.md)** —— 必须随包分发，禁止清单/允许用途/责任划分都在里面。
-- 非官方声明、免责条款（配套工程版本，已随包）：[`docs/使用条款与免责声明草案.md`](docs/使用条款与免责声明草案.md)。
+- 非官方声明、免责条款（配套工程版本，已随包）：[`docs/使用条款与免责声明.md`](docs/使用条款与免责声明.md)。
 - 第三方许可：VMT 自编译驱动的 MIT 声明与 `3rd_licence.txt` 已随包放在 `drivers/vmt/`（VMT 为 MIT，要求保留版权声明）。
 - 本 README 与 AUP 均**不构成法律建议**。
 
@@ -432,4 +434,4 @@ node tools/smoke-staged.mjs <包根>      # 从打好的包里装载插件：19 
 
 ## English summary (≤120 words)
 
-`dsh-VRChat-vplay` is an unofficial DeepSeek Harness host plugin that lets an agent interact with a locally running VRChat client. It uses VRChat's official OSC interface (UDP 9000/9001) to speak through the chatbox, read avatar parameters, and trigger `/input/*` actions, and drives head/hand poses plus virtual-controller input through two bundled SteamVR drivers (`dsh_hmd` virtual HMD, `vmt` virtual knuckles controllers) with a `drivers/install-drivers.ps1` installer. Version 0.6.0 adds 19 tools in total: `vrchat_ui` (press/stick/trigger/grab/menu/dashboard commands), `vrchat_screenshot` (see the headset before aiming), `vrchat_drivers` (status/install/uninstall), plus a local button panel at `http://127.0.0.1:8790/` and the self-contained Phase 1 virtual player (perception, A* navigation, 3D skeleton monitor, watchdog). It does **not** inject or modify the VRChat client and does not bypass EAC. Licensed MIT; usage is governed by `AUP.md`. Not affiliated with VRChat Inc. or Valve.
+`dsh-VRChat-vplay` is an unofficial DeepSeek Harness host plugin that lets an agent interact with a locally running VRChat client. It uses VRChat's official OSC interface (UDP 9000/9001) to speak through the chatbox, read avatar parameters, and trigger `/input/*` actions, and drives head/hand poses plus virtual-controller input through two bundled SteamVR drivers (`dsh_hmd` virtual HMD, `vmt` virtual knuckles controllers) with a `drivers/install-drivers.ps1` installer. Version 0.7.0 exposes the same 19 tools outside DSH too (an MCP stdio server and a standalone daemon), adds laser/aim modules with real-machine click verification, and ships the self-contained Phase 1 virtual player (perception, A* navigation, 3D skeleton monitor, watchdog) plus a local button panel at `http://127.0.0.1:8790/`. It does **not** inject or modify the VRChat client and does not bypass EAC. Licensed MIT; usage is governed by `AUP.md`. Not affiliated with VRChat Inc. or Valve.

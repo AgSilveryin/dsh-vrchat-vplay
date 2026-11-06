@@ -1,7 +1,7 @@
 // build-dist.mjs — 打自包含发布包：插件本体 + 配套 player/（真感知/导航/3D 监视器）。
 //
 // 为什么不是直接 npm pack：
-//   * 开发期 player/ 在兄弟仓库 D:\中转站API\vrchat-vr-driver\player，不在插件目录里；
+//   * 开发期 player/ 在兄弟仓库 <配套工程目录>\player，不在插件目录里；
 //   * 直接 pack 出来的包只含 OSC 桥，装到别人机器上 vrchat_player 会报 "demo not found"。
 // 所以这里先在 tmp/dist-staging 里拼一棵"自包含"的树（插件 + player/），再从那里 pack。
 //

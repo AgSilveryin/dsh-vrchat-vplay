@@ -17,7 +17,6 @@ import { existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  LEGACY_PLAYER_DIR,
   PLAYER_ACTIONS,
   PLAYER_DEFAULT,
   PLAYER_PERCEPTION_MODES,
@@ -208,8 +207,6 @@ try {
     assert.equal(PLAYER_DEFAULT.playerNode, 'node');
     assert.ok(Array.isArray(PLAYER_PERCEPTION_MODES) && PLAYER_PERCEPTION_MODES.includes('vision'));
     assert.deepEqual([...PLAYER_ACTIONS], ['start', 'stop', 'status', 'log']);
-    assert.equal(typeof LEGACY_PLAYER_DIR, 'string');
-    assert.ok(LEGACY_PLAYER_DIR.length > 0);
   });
 
   await check('playerDir 写法一：仓库根 X（X/player/demo.mjs）', () => {

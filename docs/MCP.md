@@ -23,7 +23,7 @@ tools/
 ## 1. 快速验证（不接宿主，30 秒）
 
 ```powershell
-cd D:\中转站API\dsh-vrchat-vplay
+cd <插件目录>
 
 # 自测：25 项全绿（协议纯函数 + 真子进程握手/工具清单/错误/在线与离线降级/退出码）
 node tools/test_mcp.mjs
@@ -42,7 +42,7 @@ node tools/test_mcp.mjs
 
 | 步骤 | 结果 |
 |---|---|
-| `initialize` | `serverInfo = {"name":"dsh-vrchat-vplay-mcp","version":"0.7.0"}` |
+| `initialize` | `serverInfo = {"name":"dsh-vrchat-vplay-mcp","version":"0.7.1"}` |
 | `tools/list` | **19** 个，全部有 `inputSchema.type=object` |
 | `vrchat_status` | `isError=false`，text |
 | `vrchat_doctor` | `isError=false`，text（当时真机 `player-ready`） |
@@ -78,7 +78,7 @@ npm --registry=https://registry.npmmirror.com install @modelcontextprotocol/sdk
         "{\"listenEnabled\":true,\"panelEnabled\":false}"
       ],
       "env": {
-        "VPLAY_CONFIG": "{\"playerDir\":\"D:/中转站API/vrchat-vr-driver\"}"
+        "VPLAY_CONFIG": "{\"playerDir\":\"<配套工程目录>\"}"
       }
     }
   }
@@ -92,9 +92,9 @@ npm --registry=https://registry.npmmirror.com install @modelcontextprotocol/sdk
   "mcpServers": {
     "vrchat-vplay": {
       "command": "node",
-      "args": ["D:/中转站API/dsh-vrchat-vplay/mcp/server.mjs"],
+      "args": ["<插件目录>/mcp/server.mjs"],
       "env": {
-        "VPLAY_CONFIG": "{\"listenEnabled\":true,\"panelEnabled\":false,\"playerDir\":\"D:/中转站API/vrchat-vr-driver\"}"
+        "VPLAY_CONFIG": "{\"listenEnabled\":true,\"panelEnabled\":false,\"playerDir\":\"<配套工程目录>\"}"
       }
     }
   }
@@ -106,7 +106,7 @@ npm --registry=https://registry.npmmirror.com install @modelcontextprotocol/sdk
 | 字段 | 值 |
 |---|---|
 | `command` | `node`（建议写绝对路径，某些宿主不继承 PATH） |
-| `args` | `["D:/中转站API/dsh-vrchat-vplay/mcp/server.mjs"]`，需要时追加 `--config '<json>'` |
+| `args` | `["<插件目录>/mcp/server.mjs"]`，需要时追加 `--config '<json>'` |
 | `env` | `VPLAY_CONFIG='<json>'`（可选） |
 
 ### 2.4 配置从哪来：CLI `--config` 或环境变量
@@ -152,7 +152,7 @@ node mcp/server.mjs --config '{"listenEnabled":false,"panelEnabled":false}'
 |---|---|
 | 传输 | stdin/stdout，**每行一条** JSON-RPC 2.0；无 `Content-Length`；stdout 无其它字符 |
 | 协议版本 | 支持 `2024-11-05` / `2025-03-26` / `2025-06-18`；未知版本回最新支持版本 `2025-06-18` |
-| `initialize` | 返回 `serverInfo` = `{name:"dsh-vrchat-vplay-mcp", version:"0.7.0"}`、`capabilities.tools`、一段 `instructions` |
+| `initialize` | 返回 `serverInfo` = `{name:"dsh-vrchat-vplay-mcp", version:"0.7.1"}`、`capabilities.tools`、一段 `instructions` |
 | `notifications/initialized` | 只记日志，不回复 |
 | `ping` | 返回 `{}` |
 | `tools/list` | 19 个工具；`inputSchema` = `index.js` 的 `def.parameters`（另附通用 `outputSchema`） |
@@ -198,7 +198,7 @@ node mcp/server.mjs --config '{"listenEnabled":false,"panelEnabled":false}'
 ## 5. Windows / 中文路径注意事项
 
 1. **JSON 里的反斜杠要转义**：`"D:\\中转站API\\dsh-vrchat-vplay\\mcp\\server.mjs"`；
-   或者统一用正斜杠 `"D:/中转站API/dsh-vrchat-vplay/mcp/server.mjs"`（Windows 上 Node 接受）。
+   或者统一用正斜杠 `"<插件目录>/mcp/server.mjs"`（Windows 上 Node 接受）。
 2. **路径含中文时不建议经过 shell 拼接**：MCP 配置的 `args` 是数组，直接写完整路径即可；
    `--config` 的 JSON 也作为一个参数整体传入，不要在中间再套 `cmd /c`、`%变量%`、引号拼接。
 3. **`command` 用 Node 绝对路径**（如 `C:\\Program Files\\nodejs\\node.exe`）最稳：

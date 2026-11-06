@@ -6,7 +6,7 @@
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\install-drivers.ps1
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\install-drivers.ps1 -WhatIf
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\install-drivers.ps1 -Force
-#   powershell -NoProfile -ExecutionPolicy Bypass -File .\install-drivers.ps1 -SteamPath "D:\game\steam"
+#   powershell -NoProfile -ExecutionPolicy Bypass -File .\install-drivers.ps1 -SteamPath "<Steam 安装目录>"
 #
 # Behaviour:
 #   * finds Steam via HKCU\Software\Valve\Steam\SteamPath (falls back to C:\Program Files (x86)\Steam)

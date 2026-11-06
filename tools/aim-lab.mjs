@@ -38,8 +38,8 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_DIR = resolve(HERE, '..');
-/** 旧版硬编码兜底（与 lib/player-process.mjs 的 LEGACY_PLAYER_DIR 一致；仅当它真的存在才用）。 */
-const LEGACY_PLAYER_DIR = 'D:\\中转站API\\vrchat-vr-driver';
+/** 旧路径兜底：只认环境变量 VPLAY_LEGACY_PLAYER_DIR（默认空，不硬编码任何本机路径）。 */
+const LEGACY_PLAYER_DIR = typeof process.env.VPLAY_LEGACY_PLAYER_DIR === 'string' ? process.env.VPLAY_LEGACY_PLAYER_DIR.trim() : '';
 
 const SBS_SAD_THRESHOLD = 30; // 左右两半平均亮度差的启发式阈值（0..255）
 
@@ -224,8 +224,10 @@ function resolveImagePath(file) {
   if (existsSync(direct)) return direct;
   const sibling = resolve(PLUGIN_DIR, '..', 'vrchat-vr-driver', file);
   if (existsSync(sibling)) return sibling;
-  const legacy = resolve(LEGACY_PLAYER_DIR, file);
-  if (existsSync(legacy)) return legacy;
+  if (LEGACY_PLAYER_DIR) {
+    const legacy = resolve(LEGACY_PLAYER_DIR, file);
+    if (existsSync(legacy)) return legacy;
+  }
   throw new Error(`找不到图片：${file}（已尝试 ${direct} / ${sibling}）`);
 }
 
@@ -256,7 +258,7 @@ async function loadPngDecoder(playerDirOption) {
   }
   push(join(PLUGIN_DIR, 'player', 'src', 'perception', 'png.mjs'), 'plugin'); // 自包含发布包
   push(join(PLUGIN_DIR, '..', 'vrchat-vr-driver', 'player', 'src', 'perception', 'png.mjs'), 'sibling');
-  push(join(LEGACY_PLAYER_DIR, 'player', 'src', 'perception', 'png.mjs'), 'legacy');
+  if (LEGACY_PLAYER_DIR) push(join(LEGACY_PLAYER_DIR, 'player', 'src', 'perception', 'png.mjs'), 'legacy');
 
   const tried = [];
   for (const candidate of candidates) {

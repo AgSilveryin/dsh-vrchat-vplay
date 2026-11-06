@@ -1,7 +1,7 @@
 {
   "name": "dsh-vrchat-vplay",
   "displayName": "dsh-VRChat-vplay",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -27,7 +27,8 @@
     }
   },
   "scripts": {
-    "test": "node tools/plugin-offline-test.mjs && node tools/osc-selftest.mjs && node tools/test_player.mjs",
+    "test": "node tools/run-tests.mjs",
+    "test:all": "node tools/run-tests.mjs",
     "test:toolset": "node tools/test_toolset.mjs",
     "test:mcp": "node tools/test_mcp.mjs",
     "test:vplayd": "node tools/test_vplayd.mjs",
